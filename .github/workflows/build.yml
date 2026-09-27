@@ -19,7 +19,7 @@ jobs:
       - name: Build APK using official Flet Action
         uses: flet-dev/flet-build-action@v1
         with:
-          target: android
+          target: apk
           project: .
 
       - name: Upload Finished APK
