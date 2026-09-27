@@ -6,12 +6,13 @@ workflows:
     environment:
       groups:
         - python
-      vars:
-        FLET_VERSION: "0.26.0"
     scripts:
-      - name: Setup Python environment and Build APK
+      - name: Setup Python, Flet and Build APK
         script: |
-          pip install flet==$FLET_VERSION
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install flet==0.26.0
           flet build apk
     artifacts:
       - build/apk/*.apk
