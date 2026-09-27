@@ -1,6 +1,6 @@
 name: Build Flet APK
 on:
-  workflow_dispatch: # Pozwala uruchomić budowanie ręcznie jednym przyciskiem
+  workflow_dispatch:
 
 jobs:
   build:
@@ -16,11 +16,15 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Build APK using official Flet Action
-        uses: flet-dev/flet-build-action@v1
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          target: apk
-          project: .
+          python-version: '3.11'
+
+      - name: Install Flet and Build
+        run: |
+          pip install flet==0.26.0
+          flet build apk
 
       - name: Upload Finished APK
         uses: actions/upload-artifact@v4
