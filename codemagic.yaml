@@ -1,18 +1,48 @@
-workflows:
-  flet-android-build:
-    name: Flet Android Build
-    max_build_duration: 20
-    instance_type: mac_mini_m1
-    environment:
-      groups:
-        - python
-    scripts:
-      - name: Setup Python, Flet and Build APK
-        script: |
-          python3 -m venv venv
-          source venv/bin/activate
-          pip install --upgrade pip
-          pip install flet==0.26.0
-          flet build apk
-    artifacts:
-      - build/apk/*.apk
+name: Build Android App
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java Jdk
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Buildozer and Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev tk-dev libgdbm-compat-dev liblzma-dev lzma
+          pip install buildozer cython
+
+      - name: Initialize and Build APK
+        run: |
+          # Poprawa nazwy pliku, jeśli zapisał się z podwójnym rozszerzeniem
+          if [ -f "main.py.py" ]; then mv main.py.py main.py; fi
+          
+          # Generowanie automatycznej konfiguracji dla Androida
+          buildozer init
+          
+          # Dostosowanie konfiguracji pod bibliotekę Tkinter/Gps
+          sed -i 's/requirements = python3,kivy/requirements = python3,tkintermapview,geopy,requests/g' buildozer.spec
+          
+          # Uruchomienie budowania pliku APK w trybie cichym
+          buildozer -v android debug
+          
+      - name: Upload Finished APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: taty-nawigacja
+          path: bin/*.apk
