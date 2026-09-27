@@ -2,7 +2,7 @@ workflows:
   flet-android-build:
     name: Flet Android Build
     max_build_duration: 20
-    instance_type: mac_mini_m1
+    instance_type: linux
     environment:
       groups:
         - python
