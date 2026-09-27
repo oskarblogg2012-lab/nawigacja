@@ -1,0 +1,29 @@
+name: Build Flet APK
+on:
+  workflow_dispatch: # Pozwala uruchomić budowanie ręcznie jednym przyciskiem
+
+jobs:
+  build:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java Jdk
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build APK using official Flet Action
+        uses: flet-dev/flet-build-action@v1
+        with:
+          target: android
+          project: .
+
+      - name: Upload Finished APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: flet-android-app
+          path: build/apk/*.apk
