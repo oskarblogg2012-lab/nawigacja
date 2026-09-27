@@ -16,6 +16,9 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -24,6 +27,8 @@ jobs:
       - name: Install Flet and Build
         run: |
           pip install flet==0.26.0
+          # Ta linijka naprawia nazwę pliku, jeśli zapisał się jako main.py.py
+          if [ -f "main.py.py" ]; then mv main.py.py main.py; fi
           flet build apk
 
       - name: Upload Finished APK
