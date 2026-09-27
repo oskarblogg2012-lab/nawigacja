@@ -1,4 +1,4 @@
-name: Build Flet APK
+name: Build Android App
 on:
   workflow_dispatch:
 
@@ -16,23 +16,28 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install Flet and Build
+      - name: Install Buildozer Dependencies
         run: |
-          pip install flet==0.26.0
-          # Ta linijka naprawia nazwę pliku, jeśli zapisał się jako main.py.py
+          sudo apt update
+          sudo apt install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev tk-dev libgdbm-compat-dev liblzma-dev lzma
+          pip install buildozer cython
+
+      - name: Build APK using Buildozer
+        run: |
           if [ -f "main.py.py" ]; then mv main.py.py main.py; fi
-          flet build apk
+          buildozer init
+          sed -i 's/requirements = python3,kivy/requirements = python3,tkintermapview,geopy,requests/g' buildozer.spec
+          buildozer -v android debug
+        env:
+          PURGATORY: "true"
 
       - name: Upload Finished APK
         uses: actions/upload-artifact@v4
         with:
-          name: flet-android-app
-          path: build/apk/*.apk
+          name: taty-nawigacja
+          path: bin/*.apk
