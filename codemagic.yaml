@@ -2,12 +2,12 @@ workflows:
   flet-android-build:
     name: Flet Android Build
     max_build_duration: 20
-    instance_type: linux
+    instance_type: mac_mini_m1
     environment:
       groups:
         - python
       vars:
-        FLET_VERSION: "0.27.0"
+        FLET_VERSION: "0.26.0"
     scripts:
       - name: Setup Python environment and Build APK
         script: |
